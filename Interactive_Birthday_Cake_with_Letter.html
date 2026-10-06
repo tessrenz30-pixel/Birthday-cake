@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday! 🎂✨</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #feada6 100%);
+            min-height: 100vh;
+            color: #4a4a4a;
+            overflow-x: hidden;
+        }
+
+        .font-cake {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .font-handwriting {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Floating Hearts Background */
+        .heart-particle {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUp 6s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0.5) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Glassmorphism Card Aesthetics */
+        .cake-card {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 20px 40px rgba(255, 154, 162, 0.35);
+        }
+
+        /* Cake Elements CSS Architecture */
+        .cake-container {
+            position: relative;
+            width: 260px;
+            height: 220px;
+            margin: 0 auto;
+        }
+
+        .plate {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 270px;
+            height: 18px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 15px rgba(219, 112, 147, 0.2);
+            z-index: 10;
+        }
+
+        .cake-base {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 220px;
+            height: 130px;
+            background: #f8a5c2;
+            border-radius: 16px 16px 6px 6px;
+            box-shadow: inset 0 -10px 0 #f78fb3;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .cake-layer {
+            position: absolute;
+            width: 100%;
+            height: 18px;
+            background: #f78fb3;
+        }
+        .layer-1 { top: 35px; }
+        .layer-2 { top: 75px; }
+
+        .filling {
+            position: absolute;
+            width: 100%;
+            height: 8px;
+            background: #ffffff;
+        }
+        .fill-1 { top: 27px; }
+        .fill-2 { top: 67px; }
+
+        .drips {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 25px;
+            background: #fce18a;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .whipped-topping {
+            position: absolute;
+            bottom: 145px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 40px;
+            background: #ffffff;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            z-index: 6;
+        }
+
+        .whipped-topping::before,
+        .whipped-topping::after {
+            content: '';
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+        }
+        .whipped-topping::before {
+            width: 50px;
+            height: 45px;
+            top: -18px;
+            left: 20px;
+        }
+        .whipped-topping::after {
+            width: 55px;
+            height: 50px;
+            top: -22px;
+            right: 20px;
+        }
+
+        /* Candles & Flickering Flames */
+        .candle-group {
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 12;
+        }
+
+        .candle {
+            position: relative;
+            width: 12px;
+            height: 45px;
+            background: repeating-linear-gradient(
+                45deg,
+                #ff7675,
+                #ff7675 6px,
+                #ffffff 6px,
+                #ffffff 12px
+            );
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .wick {
+            position: absolute;
+            top: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 7px;
+            background-color: #2d3436;
+        }
+
+        /* Flickering Flame (Fuego) */
+        .fuego {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 24px;
+            border-radius: 50% 50% 35% 35%;
+            background: linear-gradient(to bottom, #fff200 0%, #ff9f1a 60%, #ff3838 100%);
+            box-shadow: 0 0 12px #ffaf40, 0 0 25px #fffa65;
+            animation: flicker 0.15s infinite alternate ease-in-out, wobble 1.2s infinite ease-in-out;
+            transform-origin: center bottom;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            opacity: 1;
+        }
+
+        .fuego.off {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.2);
+            pointer-events: none;
+        }
+
+        /* Extinguish Smoke Effect */
+        .smoke {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: rgba(180, 180, 180, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .smoke.active {
+            animation: riseSmoke 1.8s ease-out forwards;
+        }
+
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1) rotate(-1deg); }
+            100% { transform: translateX(-50%) scale(1.1) rotate(2deg); }
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: translateX(-50%) rotate(-2deg); }
+            50% { transform: translateX(-50%) rotate(2deg); }
+        }
+
+        @keyframes riseSmoke {
+            0% { opacity: 0.8; transform: translateX(-50%) translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-45px) scale(3.5); }
+        }
+
+        /* Letter Modal Paper Styling */
+        .letter-paper {
+            background: #fffdf9;
+            background-image: linear-gradient(#f1e7d0 1px, transparent 1px);
+            background-size: 100% 32px;
+            line-height: 32px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col items-center justify-center p-4 relative min-h-screen">
+
+    <!-- Background Floating Hearts -->
+    <div id="heartContainer" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-md text-center z-10 flex flex-col items-center my-auto">
+        
+        <!-- Header Title -->
+        <h1 class="text-3xl sm:text-4xl font-cake text-white drop-shadow-md mb-2 flex items-center justify-center gap-2">
+            <span>Happy Birthday!</span> <i class="fa-solid fa-heart text-pink-500 animate-bounce text-2xl"></i>
+        </h1>
+        <p class="text-pink-900 font-semibold text-xs sm:text-sm mb-6 bg-white/50 backdrop-blur-md px-4 py-1.5 rounded-full inline-block shadow-sm">
+            ✨ Make a wish and blow out the candles! ✨
+        </p>
+
+        <!-- Cake Display Box -->
+        <div class="cake-card w-full rounded-3xl p-8 flex flex-col items-center relative transition-transform duration-300 hover:scale-[1.01]">
+            
+            <!-- Cake Graphic -->
+            <div class="cake-container my-6">
+                <!-- 3 Candles -->
+                <div class="candle-group">
+                    <div class="candle" onclick="blowOutCandles()">
+                        <div class="fuego"></div>
+                        <div class="smoke"></div>
+                        <div class="wick"></div>
+                    </div>
+                    <div class="candle" onclick="blowOutCandles()">
+                        <div class="fuego"></div>
+                        <div class="smoke"></div>
+                        <div class="wick"></div>
+                    </div>
+                    <div class="candle" onclick="blowOutCandles()">
+                        <div class="fuego"></div>
+                        <div class="smoke"></div>
+                        <div class="wick"></div>
+                    </div>
+                </div>
+
+                <!-- Cream Topping -->
+                <div class="whipped-topping"></div>
+
+                <!-- Cake Body -->
+                <div class="cake-base">
+                    <div class="drips"></div>
+                    <div class="filling fill-1"></div>
+                    <div class="cake-layer layer-1"></div>
+                    <div class="filling fill-2"></div>
+                    <div class="cake-layer layer-2"></div>
+                </div>
+
+                <!-- Plate -->
+                <div class="plate"></div>
+            </div>
+
+            <!-- Cake Status -->
+            <p id="cakeStatus" class="text-pink-900 font-bold text-sm mb-4">
+                🕯️ Tap the candles or button to blow them out!
+            </p>
+
+            <!-- Interactive Control Buttons -->
+            <div class="flex flex-wrap gap-3 justify-center w-full">
+                <button id="blowBtn" onclick="blowOutCandles()" class="bg-pink-500 hover:bg-pink-600 active:scale-95 text-white font-bold px-5 py-2.5 rounded-2xl shadow-md transition-all flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-wind"></i> <span id="blowBtnText">Blow Candles</span>
+                </button>
+
+                <button id="musicBtn" onclick="toggleMusic()" class="bg-white/80 hover:bg-white text-pink-600 font-bold px-4 py-2.5 rounded-2xl shadow-md transition-all active:scale-95 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-music"></i> <span id="musicBtnText">Play Song</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Open Birthday Envelope Button -->
+        <button onclick="openLetter()" class="mt-6 w-full bg-gradient-to-r from-pink-500 to-rose-400 hover:from-pink-600 hover:to-rose-500 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-3 text-base">
+            <i class="fa-solid fa-envelope-open-text text-xl animate-pulse"></i>
+            <span>Read Special Letter 💌</span>
+        </button>
+    </main>
+
+    <!-- Birthday Letter Modal -->
+    <div id="letterModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="letter-paper w-full max-w-lg rounded-3xl p-6 sm:p-8 relative transform scale-90 transition-transform duration-300 max-h-[85vh] overflow-y-auto border-4 border-pink-200">
+            
+            <!-- Close Modal Button -->
+            <button onclick="closeLetter()" class="absolute top-4 right-4 bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-full w-9 h-9 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Letter Envelope Header -->
+            <div class="text-center mb-6">
+                <span class="text-xs font-bold uppercase tracking-widest text-pink-500">From Your COF Family 💕</span>
+                <h2 class="text-3xl sm:text-4xl font-handwriting font-bold text-pink-600 mt-1">
+                    Happy Birthday! 🎉
+                </h2>
+            </div>
+
+            <!-- Custom Message Body -->
+            <div class="font-handwriting text-xl sm:text-2xl text-gray-800 space-y-4 leading-relaxed tracking-wide">
+                <p>
+                    Thank you for always being a good friend and for being there for us. We’re really grateful na naging part ka ng COF namin. 
+                </p>
+                <p>
+                    We wish you all the happiness and blessings you deserve! Sana maging strong pa kayo ni Althea and stay happy together. 💕 
+                </p>
+                <p>
+                    Always take care of each other and keep supporting each other!
+                </p>
+            </div>
+
+            <!-- Signature -->
+            <div class="mt-8 text-right font-handwriting text-2xl text-pink-600 font-bold border-t border-pink-200 pt-4">
+                <p class="text-xs font-sans font-normal text-gray-400 mb-1">With love & appreciation,</p>
+                <p>Your COF Friends ❤️</p>
+            </div>
+
+            <!-- Footer note inside Modal -->
+            <div class="mt-6 pt-3 text-center text-xs text-gray-400 border-t border-gray-100 font-sans">
+                <span>Tap anywhere outside to close</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLit = true;
+        let isPlayingAudio = false;
+        let songTimer = null;
+
+        // Render Floating Background Hearts
+        function createFloatingHearts() {
+            const container = document.getElementById('heartContainer');
+            const heartIcons = ['💖', '💕', '💗', '🌸', '✨'];
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-particle';
+                heart.innerText = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (4 + Math.random() * 5) + 's';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heart.style.fontSize = (16 + Math.random() * 18) + 'px';
+                container.appendChild(heart);
+            }
+        }
+        createFloatingHearts();
+
+        // Synthesize Happy Birthday Tune (Web Audio API)
+        class AudioSynth {
+            constructor() {
+                this.ctx = null;
+                this.isPlaying = false;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playTone(freq, duration) {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration - 0.05);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            }
+
+            playSong() {
+                this.init();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+
+                const notes = [
+                    { f: 261.63, d: 0.35 }, { f: 261.63, d: 0.25 },
+                    { f: 293.66, d: 0.6 },  { f: 261.63, d: 0.6 },
+                    { f: 349.23, d: 0.6 },  { f: 329.63, d: 1.0 },
+
+                    { f: 261.63, d: 0.35 }, { f: 261.63, d: 0.25 },
+                    { f: 293.66, d: 0.6 },  { f: 261.63, d: 0.6 },
+                    { f: 392.00, d: 0.6 },  { f: 349.23, d: 1.0 },
+
+                    { f: 261.63, d: 0.35 }, { f: 261.63, d: 0.25 },
+                    { f: 523.25, d: 0.6 },  { f: 440.00, d: 0.6 },
+                    { f: 349.23, d: 0.6 },  { f: 329.63, d: 0.6 },
+                    { f: 293.66, d: 0.8 },
+
+                    { f: 466.16, d: 0.35 }, { f: 466.16, d: 0.25 },
+                    { f: 440.00, d: 0.6 },  { f: 349.23, d: 0.6 },
+                    { f: 392.00, d: 0.6 },  { f: 349.23, d: 1.2 }
+                ];
+
+                let idx = 0;
+                this.isPlaying = true;
+
+                const step = () => {
+                    if (!this.isPlaying) return;
+                    if (idx >= notes.length) idx = 0;
+                    const n = notes[idx];
+                    this.playTone(n.f, n.d);
+                    idx++;
+                    songTimer = setTimeout(step, n.d * 650);
+                };
+
+                step();
+            }
+
+            stop() {
+                this.isPlaying = false;
+                if (songTimer) clearTimeout(songTimer);
+            }
+
+            playBlowSound() {
+                this.init();
+                const bufferSize = this.ctx.sampleRate * 0.4;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(300, this.ctx.currentTime);
+
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                noise.start();
+            }
+        }
+
+        const synth = new AudioSynth();
+
+        // Candle blowing & relighting handler
+        function blowOutCandles() {
+            const flames = document.querySelectorAll('.fuego');
+            const smokes = document.querySelectorAll('.smoke');
+            const statusText = document.getElementById('cakeStatus');
+            const blowBtnText = document.getElementById('blowBtnText');
+
+            if (!isLit) {
+                // Relight candles
+                flames.forEach(f => f.classList.remove('off'));
+                isLit = true;
+                statusText.innerText = '🕯️ Tap the candles or button to blow them out!';
+                blowBtnText.innerText = 'Blow Candles';
+                return;
+            }
+
+            // Extinguish Flames
+            flames.forEach(f => f.classList.add('off'));
+            smokes.forEach(s => {
+                s.classList.remove('active');
+                void s.offsetWidth; // Force CSS reflow
+                s.classList.add('active');
+            });
+
+            isLit = false;
+            synth.playBlowSound();
+
+            statusText.innerText = '✨ Wish granted! Happy Birthday! ✨';
+            blowBtnText.innerText = 'Relight Candles';
+
+            // Launch Confetti Burst
+            triggerConfetti();
+
+            // Auto-start birthday music if not playing
+            if (!isPlayingAudio) {
+                toggleMusic();
+            }
+        }
+
+        // Celebration Confetti
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 110,
+                    spread: 75,
+                    origin: { y: 0.6 }
+                });
+
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 50,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 }
+                    });
+                }, 250);
+
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 50,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 }
+                    });
+                }, 400);
+            }
+        }
+
+        // Toggle Sound Melody
+        function toggleMusic() {
+            const musicBtnText = document.getElementById('musicBtnText');
+            if (isPlayingAudio) {
+                synth.stop();
+                isPlayingAudio = false;
+                musicBtnText.innerText = 'Play Song';
+            } else {
+                synth.playSong();
+                isPlayingAudio = true;
+                musicBtnText.innerText = 'Pause Song';
+            }
+        }
+
+        // Letter Modal Open / Close Handlers
+        function openLetter() {
+            const modal = document.getElementById('letterModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.remove('scale-90');
+            modal.children[0].classList.add('scale-100');
+        }
+
+        function closeLetter() {
+            const modal = document.getElementById('letterModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.remove('scale-100');
+            modal.children[0].classList.add('scale-90');
+        }
+
+        // Modal backdrop click to close
+        document.getElementById('letterModal').addEventListener('click', (e) => {
+            if (e.target.id === 'letterModal') {
+                closeLetter();
+            }
+        });
+    </script>
+</body>
+</html>
